@@ -7,4 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Keyword extends Model
 {
     //
+    protected $fillable = ['name', 'price','volume'];
+
+    public $timestamps = true;
+
 }

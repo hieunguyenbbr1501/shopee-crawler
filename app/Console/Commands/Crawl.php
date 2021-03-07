@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Product;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Console\Command;
@@ -39,14 +40,28 @@ class Crawl extends Command
      */
     public function handle()
     {
-        $keyword = "test";
-        $quantity = "50";
+        $keyword = "áo";
+        $quantity = "20";
 //        $link = "https://shopee.vn/api/v2/search_items/?by=relevancy&keyword=".$keyword."&limit=".$quantity."&newest=0&order=desc&page_type=search";
 //        $client = new Client();
 //        $response = $client->request('GET', $link);
 //        echo $response;
         $response = $this->LoginShopee('hieu15011', 'Thangnao?123', $keyword, $quantity);
-        dd($response["items"]);
+        $data = $response["items"];
+        foreach ($data as $item) {
+            $product = Product::firstOrCreate([
+                'id' => $item["itemid"]
+            ]);
+            $product->name = $item["name"];
+            $product->sold = $item["sold"];
+            $product->history_sold = $item["historical_sold"];
+            $product->price_min = $item["price_min"];
+            $product->price_max = $item["price_max"];
+            $product->rating  =$item["item_rating"]["rating_star"];
+            $product->liked = $item["liked_count"];
+            $product->save();
+
+    }
 
         return 0;
     }
