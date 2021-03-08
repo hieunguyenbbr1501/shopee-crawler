@@ -16,7 +16,7 @@ class RenameLikedColumnInProductsTable extends Migration
         Schema::table('products', function (Blueprint $table) {
             //
             $table->removeColumn('linked');
-            $table->integer('liked');
+            $table->integer('liked')->nullable();
         });
     }
 
@@ -30,7 +30,7 @@ class RenameLikedColumnInProductsTable extends Migration
         Schema::table('products', function (Blueprint $table) {
             //
             $table->removeColumn('liked');
-            $table->integer('linked');
+            $table->integer('linked')->nullable();
         });
     }
 }

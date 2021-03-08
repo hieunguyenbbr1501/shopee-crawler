@@ -21,7 +21,7 @@ class CreateProductsTable extends Migration
             $table->double("price_min")->nullable();
             $table->double("price_max")->nullable();
             $table->double("rating")->nullable();
-            $table->integer("linked")->nullable();
+            $table->integer("liked")->nullable();
             $table->integer("view")->nullable();
             $table->timestamps();
         });

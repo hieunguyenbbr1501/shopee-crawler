@@ -7,21 +7,21 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Console\Command;
 
-class Crawl extends Command
+class CrawlProduct extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'crawl:begin';
+    protected $signature = 'crawl:product';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Crawl data';
+    protected $description = 'Crawl Product data';
 
     /**
      * Create a new command instance.
