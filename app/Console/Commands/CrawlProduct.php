@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Keyword;
 use App\Product;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
@@ -40,36 +41,6 @@ class CrawlProduct extends Command
      */
     public function handle()
     {
-        $keyword = "áo";
-        $quantity = "20";
-//        $link = "https://shopee.vn/api/v2/search_items/?by=relevancy&keyword=".$keyword."&limit=".$quantity."&newest=0&order=desc&page_type=search";
-//        $client = new Client();
-//        $response = $client->request('GET', $link);
-//        echo $response;
-        $response = $this->LoginShopee('hieu15011', 'Thangnao?123', $keyword, $quantity);
-        $data = $response["items"];
-        foreach ($data as $item) {
-            $product = Product::firstOrCreate([
-                'id' => $item["itemid"]
-            ]);
-            $product->name = $item["name"];
-            $product->sold = $item["sold"];
-            $product->history_sold = $item["historical_sold"];
-            $product->price_min = $item["price_min"];
-            $product->price_max = $item["price_max"];
-            $product->rating  =$item["item_rating"]["rating_star"];
-            $product->liked = $item["liked_count"];
-            $product->save();
-
-    }
-
-        return 0;
-    }
-
-    function LoginShopee($SP_Username, $SP_Pass, $keyword, $quantity)
-    {
-
-        //Khởi tạo chung cho toàn bộ request bên dưới
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -98,9 +69,9 @@ class CrawlProduct extends Command
         );
 
         $data = array(
-            "login_key" => $SP_Username,
+            "login_key" => 'hieu15011',
             "login_type" => "username",
-            "password_hash" => $this->CryptPass($SP_Pass),
+            "password_hash" => $this->CryptPass('Thangnao?123'),
             "captcha" => "",
             "remember_me" => "true"
         );
@@ -120,12 +91,44 @@ class CrawlProduct extends Command
         // Request lấy thông tin tài khoản sau khi đã đăng nhập thành công
         curl_setopt($ch, CURLOPT_URL, "https://banhang.shopee.vn/api/v2/login/");
         $response = curl_exec($ch);
+        $quantity = "20";
+
+        $keywords = Keyword::all();
+        foreach ($keywords as $keyword) {
+        $response = $this->LoginShopee($keyword["name"], $quantity, $ch);
+        $data = $response["items"];
+        if ($data != null) {
+            foreach ($data as $item) {
+                $product = Product::firstOrCreate([
+                    'id' => $item["itemid"]
+                ]);
+                $product->name = $item["name"];
+                $product->sold = $item["sold"];
+                $product->history_sold = $item["historical_sold"];
+                $product->price_min = $item["price_min"];
+                $product->price_max = $item["price_max"];
+                $product->rating  =$item["item_rating"]["rating_star"];
+                $product->liked = $item["liked_count"];
+                $product->view = $item["view_count"];
+                $product->keywords()->attach([$keyword->id]);
+                $product->save();
+
+            }
+
+        }
+        }
+        return 0;
+    }
+
+    function LoginShopee($keyword, $quantity, $ch)
+    {
+
+        //Khởi tạo chung cho toàn bộ request bên dưới
+
         // echo $response;
         curl_setopt($ch, CURLOPT_POST, 0);
-        echo "https://shopee.vn/api/v2/search_items/?by=relevancy&keyword=" . urlencode($keyword)
-            . "&limit=" . urlencode($quantity) . "&match_id=8595&newest=0&order=desc&page_type=search&version=2";
         curl_setopt($ch, CURLOPT_URL, "https://shopee.vn/api/v2/search_items/?by=relevancy&keyword="
-            . urlencode($keyword) . "&limit=" . $quantity . "&match_id=8595&newest=0&order=desc&page_type=search&version=2");
+            . urlencode($keyword) . "&limit=" . $quantity . "&newest=0&sortBy=sales&order=desc&page_type=search&version=2");
         $response = curl_exec($ch);
         $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($response, 0, $header_size);

@@ -16,8 +16,8 @@ class CreateKeywordProductTable extends Migration
         Schema::create('keyword_product', function (Blueprint $table) {
             //
             $table->increments('id');
-            $table->integer('keyword_id');
-            $table->integer('product_id');
+            $table->string('keyword_id');
+            $table->string('product_id');
         });
     }
 

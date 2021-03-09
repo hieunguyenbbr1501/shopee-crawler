@@ -11,4 +11,5 @@ class Keyword extends Model
 
     public $timestamps = true;
 
+
 }
