@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Category;
 use App\Keyword;
 use Illuminate\Console\Command;
 
@@ -40,8 +41,8 @@ class CrawlKeyword extends Command
     {
         $source = "keywords.txt";
         $contents = file_get_contents($source);
-        $contents = preg_replace( "/\r|\n/", "", $contents );
-        $arrfields = explode(',', $contents);
+        $contents = trim($contents);
+        $contents = explode("\n", $contents);
         $SP_Username = "hieu15011";
         $SP_Pass = "Thangnao?123";
         $ch = curl_init();
@@ -94,17 +95,32 @@ class CrawlKeyword extends Command
         // Request lấy thông tin tài khoản sau khi đã đăng nhập thành công
         curl_setopt($ch, CURLOPT_URL, "https://banhang.shopee.vn/api/v2/login/");
         $response = curl_exec($ch);
-        // echo $response;
         curl_setopt($ch, CURLOPT_POST, 0);
-        foreach ($arrfields as $keyword) {
-            $response = $this->LoginShopee($keyword, $ch);
-            foreach($response["data"] as $data) {
-                $keyword = Keyword::firstOrCreate(['name' => $data["keyword"]]);
-                $keyword->price = $data["recommend_price"];
-                $keyword->volume = $data["search_volume"];
-                $keyword->save();
+
+        // echo $response;
+        foreach ($contents as $content) {
+            $group = explode(":", $content);
+            $category = Category::firstOrCreate([
+                'name' => $group[0]
+            ]);
+            $category->save();
+            echo $group[1];
+            $keywords = preg_replace("/\r|\n/", "", $group[1]);
+            $keywords = explode(",", $keywords);
+            if ($keywords != null) {
+                foreach ($keywords as $keyword) {
+                    $response = $this->LoginShopee($keyword, $ch);
+                    foreach($response["data"] as $data) {
+                        $keyword = Keyword::firstOrCreate(['name' => $data["keyword"], 'category_id' => $category->id]);
+                        $keyword->price = $data["recommend_price"];
+                        $keyword->volume = $data["search_volume"];
+                        $keyword->save();
+                    }
+                }
             }
+
         }
+
     }
     function LoginShopee($keyword, $ch)
     {

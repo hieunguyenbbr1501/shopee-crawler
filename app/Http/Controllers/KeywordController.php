@@ -18,6 +18,15 @@ class KeywordController extends Controller
     }
 
     /**
+     * List keywords by search form
+     * @param Request $request
+     */
+    public function searchByRelevant(Request $request) {
+        $keywords = Keyword::search($request->request->get("keyword"))->orderBy('volume', 'desc')->limit(10)->get();
+        return view('listing')->with(compact('keywords'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
