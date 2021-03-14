@@ -82,4 +82,10 @@ class CategoryController extends Controller
     {
         //
     }
+
+    public function detail($id) {
+        $category = Category::where(['id' => $id])->firstOrFail();
+        $keywords = $category->keywords;
+        return view('category')->with(compact('category', 'keywords'));
+    }
 }

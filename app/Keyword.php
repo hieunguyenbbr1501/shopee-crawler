@@ -17,6 +17,11 @@ class Keyword extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
 
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'keyword_product', 'keyword_id', 'product_id');
+    }
+
     public $timestamps = true;
 
     protected function fullTextWildcards($term)

@@ -13,10 +13,8 @@
                             {{ session('status') }}
                         </div>
                     @endif
-
-                    {{ __('You are logged in!') }}
                         <form action="{{ route('keyword.search.list') }}" method="get">
-                            <input type="select" name="keyword" class="form-control">
+                            <input type="select" name="keyword" class="form-control" placeholder="Nhập từ khóa...">
                         </form>
                 </div>
             </div>

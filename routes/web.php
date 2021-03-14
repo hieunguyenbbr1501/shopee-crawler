@@ -16,8 +16,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 })->middleware('auth');
-Route::get('/search/{keyword}', '\App\Http\Controllers\KeywordController@show')->name('keyword.search');
-Route::get('/search', '\App\Http\Controllers\KeywordController@searchByRelevant')->name('keyword.search.list');
+Route::get('/keyword/{keyword}', '\App\Http\Controllers\KeywordController@show')->name('keyword.detail')->middleware('auth');
+Route::get('/search', '\App\Http\Controllers\KeywordController@searchByRelevant')->name('keyword.search.list')->middleware('auth');
+Route::get('/category/{id}', '\App\Http\Controllers\CategoryController@detail')->name('category.detail')->middleware('auth');
 
 Auth::routes();
 

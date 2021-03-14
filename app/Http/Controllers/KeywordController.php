@@ -56,8 +56,15 @@ class KeywordController extends Controller
     public function show($keyword)
     {
         //
-        $response = $this->LoginShopee('hieu15011', 'Thangnao?123', $keyword);
-        dd(($response["data"]));
+        $data = Keyword::where(['name' => $keyword])->first();
+        if ($data) {
+            $products = $data->products()->get();
+            return view('welcome')->with(compact('data', 'products'));
+        } else {
+            $response = $this->LoginShopee('hieu15011', 'Thangnao?123', $keyword);
+            dd(($response["data"]));
+        }
+
 
     }
 
