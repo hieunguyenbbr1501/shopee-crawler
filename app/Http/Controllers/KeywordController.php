@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Category;
 use App\Keyword;
+use Google\GTrends;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
 class KeywordController extends Controller
@@ -20,43 +23,66 @@ class KeywordController extends Controller
     /**
      * List keywords by search form
      * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function searchByRelevant(Request $request) {
-        $keywords = Keyword::search($request->request->get("keyword"))->orderBy('volume', 'desc')->limit(10)->get();
-        return view('listing')->with(compact('keywords'));
+        $categories = Category::all();
+        $keywords = Keyword::query();
+        if ($request->has('category') && $request->get('category') != null) {
+            $keywords->category($request->get('category'));
+        }
+        $keyword_prompt = Keyword::where('name', '=', $request->get('keyword'))->first();
+        if ($keyword_prompt == null) {
+            $data = $this->LoginShopee('hieu15011', 'Thangnao?123', $request->get('keyword'));
+            foreach ($data["data"] as $word) {
+                $category = Category::firstOrCreate([
+                    'name' => 'Khác'
+                ]);
+
+                $keyword = Keyword::where('name', '=', $word["keyword"])->first();
+                if ($keyword == null) {
+                    $keyword = Keyword::firstOrCreate([
+                        'name' => $word["keyword"],
+                        'category_id' => $category->id
+                    ]);
+                }
+                $keyword->price = $word["recommend_price"];
+                $keyword->volume = $word["search_volume"];
+                $keyword->save();
+            }
+        }
+        $keywords = $keywords->search($request->request->get("keyword"));
+        if ($request->has('sorting')) {
+            switch ($request->get('sorting')) {
+                case 'priceDesc': {
+                    $keywords->orderBy('price', 'desc');
+                }
+                case 'priceAsc': {
+                    $keywords->orderBy('price', 'asc');
+                }
+                case 'volumeDesc': {
+                    $keywords->orderBy('volume', 'desc');
+                }
+                case 'volumeAsc': {
+                    $keywords->orderBy('volume', 'asc');
+                }
+            }
+        }
+        $keywords = $keywords->limit(10)->get();
+        return view('listing')->with(compact('keywords', 'categories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Keyword  $keyword
-     * @return \Illuminate\Http\Response
-     */
     public function show($keyword)
     {
-        //
         $data = Keyword::where(['name' => $keyword])->first();
+        $options = [
+            'hl' => 'en-US',
+            'tz' => -60,
+            'geo' => 'IE'
+        ];
+        $gt = new GTrends($options);
+
+        dd($gt->interestOverTime(['Donald Trump']));
         if ($data) {
             $products = $data->products()->get();
             return view('welcome')->with(compact('data', 'products'));

@@ -62,6 +62,14 @@ class Keyword extends Model
 
         return $query;
     }
+    public function scopeCategory($query, $category)
+    {
+        if ($category != null) {
+            $query->where(['category_id' => $category]);
+        }
+
+        return $query;
+    }
 
 
 }

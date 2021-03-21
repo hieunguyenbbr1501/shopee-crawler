@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/home');
 })->middleware('auth');
 Route::get('/keyword/{keyword}', '\App\Http\Controllers\KeywordController@show')->name('keyword.detail')->middleware('auth');
 Route::get('/search', '\App\Http\Controllers\KeywordController@searchByRelevant')->name('keyword.search.list')->middleware('auth');
