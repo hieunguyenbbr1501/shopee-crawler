@@ -1,0 +1,4 @@
+[0405/023753.580:ERROR:registration_protocol_win.cc(63)] BuildSecurityDescriptor: The specified network provider name is invalid. (0x4B4)
+[0405/023839.685:ERROR:registration_protocol_win.cc(63)] BuildSecurityDescriptor: The specified network provider name is invalid. (0x4B4)
+[0405/023912.623:ERROR:registration_protocol_win.cc(63)] BuildSecurityDescriptor: The specified network provider name is invalid. (0x4B4)
+[0405/024117.686:ERROR:registration_protocol_win.cc(63)] BuildSecurityDescriptor: The specified network provider name is invalid. (0x4B4)

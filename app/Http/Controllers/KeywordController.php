@@ -7,6 +7,7 @@ use App\Keyword;
 use Google\GTrends;
 use Google_Service_Books;
 use GuzzleHttp\Client;
+use HeadlessChromium\BrowserFactory;
 use Illuminate\Http\Request;
 
 class KeywordController extends Controller
@@ -75,23 +76,37 @@ class KeywordController extends Controller
             'tz'  => -60, # last hour
             'geo' => 'VN',
         ];
-        $service_url = 'https://customsearch.googleapis.com/search/v1?cx=017576662512468239146%3Aomuauf_lfve&q=test&key='
+//        $browserFactory = new BrowserFactory('C:\Program Files (x86)\Google\Chrome\Application\chrome.exe');
+//        $browser = $browserFactory->createBrowser([
+//            'headless'        => false,          // disable headless mode
+//        ]);
+//        $uri = 'http://example.com';
+//        $page = $browser->createPage();
+//        $navigation = $page->navigate("https://www.google.com/search?q=test");
+//
+//        $navigation->waitForNavigation(Page::DOM_CONTENT_LOADED, 10000);
+//        $evaluation = $page->evaluate('document.documentElement.innerHTML');
+//
+//// wait for the value to return and get it
+//        $value = $evaluation->getReturnValue();
+//        $browser->close();
+//        dd($value);
+        $service_url = 'https://www.googleapis.com/customsearch/v1?q='.urlencode($keyword).'&gl=VN&cx=017576662512468239146%3Aomuauf_lfve&key='
             .env("API_KEY");
         $url = $service_url;
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_URL, $service_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $response = json_decode(curl_exec($ch), true);
         curl_close($ch);
-        dd($response);
+        $google_volume = ($response["searchInformation"]["totalResults"]);
         $gt = new GTrends($options);
         //dd($gt->getRealTimeSearchTrends());
         $categories = Category::all();
         $google_analytic = $gt->interestOverTime($keyword, 0, 'today 1-m');
-        $google_volume = $gt->getRelatedSearchQueries($keyword);
         if ($data) {
             $products = $data->products()->get();
-            return view('detail')->with(compact('data', 'products', 'google_analytic', 'categories'));
+            return view('detail')->with(compact('data', 'products', 'google_analytic', 'categories', 'google_volume'));
         } else {
             $response = $this->LoginShopee('hieu15011', 'Thangnao?123', $keyword);
             dd(($response["data"]));
