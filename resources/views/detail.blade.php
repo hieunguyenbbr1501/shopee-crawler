@@ -19,7 +19,9 @@
 
     <!-- Custom styles for this template-->
     <link href="{{ asset('css/sb-admin-2.min.css') }} " rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.css">
+    <link rel="stylesheet" href="{{ asset('css/star-rating.css') }}">
+{{--    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-star-rating/4.0.6/css/star-rating.min.css" media="all" rel="stylesheet" type="text/css" />--}}
 </head>
 
 <body id="page-top">
@@ -167,16 +169,35 @@
                 </button>
 
                 <!-- Topbar Search -->
-                <form
-                    class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" action="{{ route('keyword.search.list') }}">
-                    <div class="input-group">
-                        <input type="text" class="form-control bg-light border-0 small" placeholder="Tìm từ khóa..."
-                               aria-label="Search" aria-describedby="basic-addon2" name="keyword">
+                <form action="{{ route('keyword.search.list') }}" id="searchForm"
+                      class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 w-100 navbar-search" style="display: flex !important;">
+                    <div class="input-group col-4">
+                        <input type="text" name="keyword" class="form-control bg-light border-0 small" placeholder="Search for..."
+                               aria-label="Search" aria-describedby="basic-addon2">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="button">
+                            <button class="btn btn-primary" type="submit">
                                 <i class="fas fa-search fa-sm"></i>
                             </button>
                         </div>
+                    </div>
+                    <div class="input-group col-2">
+                        <select class="form-select form-control" id="category" onchange="onCategoryChange()"
+                                aria-label="Ngành hàng">
+                            <option selected>Ngành hàng</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-2 input-group">
+                        <select class="form-select form-control" id="sorting" onchange="onSortingChange()"
+                                aria-label="Sắp xếp">
+                            <option selected>Sắp xếp</option>
+                            <option value="priceDesc">Giá: Cao đến thấp</option>
+                            <option value="priceAsc">Giá: Thấp đến cao</option>
+                            <option value="volumeDesc">Lượng tìm kiếm: Cao đến thấp</option>
+                            <option value="volumeAsc">Lượng tìm kiếm: Thấp đến cao</option>
+                        </select>
                     </div>
                 </form>
 
@@ -192,16 +213,35 @@
                         <!-- Dropdown - Messages -->
                         <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
                              aria-labelledby="searchDropdown">
-                            <form class="form-inline mr-auto w-100 navbar-search">
-                                <div class="input-group">
-                                    <input type="text" class="form-control bg-light border-0 small"
-                                           placeholder="Search for..." aria-label="Search"
-                                           aria-describedby="basic-addon2">
+                            <form action="{{ route('keyword.search.list') }}" id="searchForm"
+                                  class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 w-100 navbar-search" style="display: flex !important;">
+                                <div class="input-group col-4">
+                                    <input type="text" name="keyword" class="form-control bg-light border-0 small" placeholder="Search for..."
+                                           aria-label="Search" aria-describedby="basic-addon2">
                                     <div class="input-group-append">
-                                        <button class="btn btn-primary" type="button">
+                                        <button class="btn btn-primary" type="submit">
                                             <i class="fas fa-search fa-sm"></i>
                                         </button>
                                     </div>
+                                </div>
+                                <div class="input-group col-2">
+                                    <select class="form-select form-control" id="category" onchange="onCategoryChange()"
+                                            aria-label="Ngành hàng">
+                                        <option selected>Ngành hàng</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-2 input-group">
+                                    <select class="form-select form-control" id="sorting" onchange="onSortingChange()"
+                                            aria-label="Sắp xếp">
+                                        <option selected>Sắp xếp</option>
+                                        <option value="priceDesc">Giá: Cao đến thấp</option>
+                                        <option value="priceAsc">Giá: Thấp đến cao</option>
+                                        <option value="volumeDesc">Lượng tìm kiếm: Cao đến thấp</option>
+                                        <option value="volumeAsc">Lượng tìm kiếm: Thấp đến cao</option>
+                                    </select>
                                 </div>
                             </form>
                         </div>
@@ -382,8 +422,10 @@
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                            Lượng tìm kiếm</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($data->volume) }}</div>
+                                            Lượng tìm kiếm
+                                        </div>
+                                        <div
+                                            class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($data->volume) }}</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-calendar fa-2x text-gray-300"></i>
@@ -400,8 +442,12 @@
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                            Giá từ khóa</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($data->price) }}đ</div>
+                                            Giá từ khóa
+                                        </div>
+                                        <div
+                                            class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($data->price) }}
+                                            đ
+                                        </div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -527,33 +573,42 @@
             <!-- /.container-fluid -->
 
         </div>
+        <div class="container-fluid">
+            <div class="row ml-2 mr-2">
+                <div class="col-12 card p-0">
+                    <div class="table-responsive p-0">
+                        <table class="col-12 table table-sm">
+                            <thead class="thead-light">
+                            <tr>
+                                <th>#</th>
+                                <th width="450px">Tên Sản phẩm</th>
+                                <th>Giá</th>
+                                <th>Doanh số 30 ngày qua</th>
+                                <th>Lượt thích</th>
+                                <th>Đánh giá</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($products as $product)
+                                <tr style="color: #24292e !important; line-height: 1.4">
+                                    <td>{{ $loop->index + 1  }}</td>
+                                    <td><a href="{{ $product->slug }}">{{ $product->name }}</a></td>
+                                    <td>{{ $product->price_min/100000 }}đ - {{ $product->price_max/100000 }}đ</td>
+                                    <td>{{ $product->sold }}</td>
+                                    <td>{{ $product->liked }}</td>
+                                    <td class="rating" data-rating="{{ $product->rating }}">
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-        <div class="table-responsive container-fluid">
-            <table class="col-12 table table-striped table-sm">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Tên Sản phẩm</th>
-                    <th>Giá</th>
-                    <th>Doanh số 30 ngày qua</th>
-                    <th>Lượt thích</th>
-                    <th>Đánh giá</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($products as $product)
-                <tr>
-                    <td>{{ $loop->index + 1  }}</td>
-                    <td>{{ $product->name }}</td>
-                    <td>{{ $product->price_min/100000 }}đ - {{ $product->price_max/100000 }}đ</td>
-                    <td>{{ $product->sold }}</td>
-                    <td>{{ $product->liked }}</td>
-                    <td>{{ $product->rating }}</td>
-                </tr>
-                @endforeach
-                </tbody>
-            </table>
+            </div>
         </div>
+
+
         <!-- End of Main Content -->
 
         <!-- Footer -->
@@ -609,10 +664,122 @@
 
 <!-- Page level plugins -->
 <script src="{{ asset('vendor/chart.js/Chart.min.js') }}"></script>
-
-<!-- Page level custom scripts -->
 <script src="{{ asset('js/demo/chart-area-demo.js') }} "></script>
 <script src="{{ asset('js/demo/chart-pie-demo.js') }}"></script>
+<script src="{{ asset('js/star-rating.js') }}"></script>
+{{--<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-star-rating/4.0.6/js/star-rating.min.js" type="text/javascript"></script>--}}
+
+<!-- Page level custom scripts -->
+<script type="text/javascript">
+    $(".rating").starRating({
+        totalStars: 5,
+        starSize: 25,
+        emptyColor: 'lightgray',
+        hoverColor: 'salmon',
+        activeColor: 'orange',
+        useGradient: false,
+        readOnly: true
+
+    });
+    chartData = [];
+    labels = [];
+        @foreach($google_analytic as $analytic)
+        @if(true)
+            chartData.push({{$analytic["value"][0]}});
+            labels.push("{{$analytic["formattedTime"]}}")
+        @endif
+        @endforeach
+    var ctx = document.getElementById("myAreaChart");
+    var myLineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Tỉ lệ tìm kiếm",
+                lineTension: 0.3,
+                backgroundColor: "rgba(78, 115, 223, 0.05)",
+                borderColor: "rgba(78, 115, 223, 1)",
+                pointRadius: 3,
+                pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                pointBorderColor: "rgba(78, 115, 223, 1)",
+                pointHoverRadius: 3,
+                pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                pointHitRadius: 10,
+                pointBorderWidth: 2,
+                data: chartData,
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
+            },
+            scales: {
+                xAxes: [{
+                    time: {
+                        unit: 'date'
+                    },
+                    gridLines: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        maxTicksLimit: 7
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        maxTicksLimit: 5,
+                        padding: 10,
+                        // Include a dollar sign in the ticks
+                        callback: function (value, index, values) {
+                            return number_format(value);
+                        }
+                    },
+                    gridLines: {
+                        color: "rgb(234, 236, 244)",
+                        zeroLineColor: "rgb(234, 236, 244)",
+                        drawBorder: false,
+                        borderDash: [2],
+                        zeroLineBorderDash: [2]
+                    }
+                }],
+            },
+            legend: {
+                display: false
+            },
+            tooltips: {
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                titleMarginBottom: 10,
+                titleFontColor: '#6e707e',
+                titleFontSize: 14,
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                intersect: false,
+                mode: 'index',
+                caretPadding: 10,
+                callbacks: {
+                    label: function (tooltipItem, chart) {
+                        var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                        return datasetLabel + ': ' + number_format(tooltipItem.yLabel);
+                    }
+                }
+            }
+        }
+    });
+
+</script>
+
 
 </body>
 

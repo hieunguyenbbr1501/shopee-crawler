@@ -10,12 +10,17 @@
     "require": {
         "php": "^7.2.5|^8.0",
         "ext-curl": "*",
+        "dapphp/torutils": "^1.15",
         "doctrine/dbal": "^2.10",
-        "fideloper/proxy": "^4.4",
+        "fabpot/goutte": "^4.0",
         "fruitcake/laravel-cors": "^2.0",
+        "google/apiclient": "^2.7",
         "guzzlehttp/guzzle": "^6.3.1|^7.0.1",
+        "kriswallsmith/buzz": "^1.2",
         "laravel/framework": "^7.29",
         "laravel/tinker": "^2.5",
+        "nyholm/psr7": "^1.4",
+        "spatie/crawler": "^4.7",
         "x-fran/g-trends": "^2.2"
     },
     "require-dev": {

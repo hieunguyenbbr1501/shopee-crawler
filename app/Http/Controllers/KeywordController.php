@@ -5,20 +5,13 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Keyword;
 use Google\GTrends;
+use Google_Service_Books;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
 class KeywordController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
+
 
     /**
      * List keywords by search form
@@ -32,6 +25,7 @@ class KeywordController extends Controller
             $keywords->category($request->get('category'));
         }
         $keyword_prompt = Keyword::where('name', '=', $request->get('keyword'))->first();
+        $res = $request->get('keyword');
         if ($keyword_prompt == null) {
             $data = $this->LoginShopee('hieu15011', 'Thangnao?123', $request->get('keyword'));
             foreach ($data["data"] as $word) {
@@ -49,6 +43,7 @@ class KeywordController extends Controller
                 $keyword->price = $word["recommend_price"];
                 $keyword->volume = $word["search_volume"];
                 $keyword->save();
+                $res = $keyword->keyword;
             }
         }
         $keywords = $keywords->search($request->request->get("keyword"));
@@ -69,23 +64,34 @@ class KeywordController extends Controller
             }
         }
         $keywords = $keywords->limit(10)->get();
-        return view('listing')->with(compact('keywords', 'categories'));
+        return view('listing')->with(compact('keywords', 'categories','res'));
     }
 
     public function show($keyword)
     {
         $data = Keyword::where(['name' => $keyword])->first();
         $options = [
-            'hl' => 'en-US',
-            'tz' => -60,
-            'geo' => 'IE'
+            'hl'  => 'en-US',
+            'tz'  => -60, # last hour
+            'geo' => 'VN',
         ];
+        $service_url = 'https://customsearch.googleapis.com/search/v1?cx=017576662512468239146%3Aomuauf_lfve&q=test&key='
+            .env("API_KEY");
+        $url = $service_url;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $response = json_decode(curl_exec($ch), true);
+        curl_close($ch);
+        dd($response);
         $gt = new GTrends($options);
-
-        dd($gt->interestOverTime(['Donald Trump']));
+        //dd($gt->getRealTimeSearchTrends());
+        $categories = Category::all();
+        $google_analytic = $gt->interestOverTime($keyword, 0, 'today 1-m');
+        $google_volume = $gt->getRelatedSearchQueries($keyword);
         if ($data) {
             $products = $data->products()->get();
-            return view('welcome')->with(compact('data', 'products'));
+            return view('detail')->with(compact('data', 'products', 'google_analytic', 'categories'));
         } else {
             $response = $this->LoginShopee('hieu15011', 'Thangnao?123', $keyword);
             dd(($response["data"]));
