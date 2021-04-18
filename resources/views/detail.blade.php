@@ -21,7 +21,7 @@
     <link href="{{ asset('css/sb-admin-2.min.css') }} " rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.css">
     <link rel="stylesheet" href="{{ asset('css/star-rating.css') }}">
-{{--    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-star-rating/4.0.6/css/star-rating.min.css" media="all" rel="stylesheet" type="text/css" />--}}
+    {{--    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-star-rating/4.0.6/css/star-rating.min.css" media="all" rel="stylesheet" type="text/css" />--}}
 </head>
 
 <body id="page-top">
@@ -463,11 +463,11 @@
                             <div class="card-body">
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Điểm
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Lượng kết quả tìm kiếm trên Google
                                         </div>
                                         <div class="row no-gutters align-items-center">
                                             <div class="col-auto">
-                                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
+                                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ number_format((int)$google_volume) }}</div>
                                             </div>
                                             <div class="col">
                                                 <!--                                                <div class="progress progress-sm mr-2">-->
@@ -553,13 +553,10 @@
                                 </div>
                                 <div class="mt-4 text-center small">
                                         <span class="mr-2">
-                                            <i class="fas fa-circle text-primary"></i> Mạng xã hội
+                                            <i class="fas fa-circle text-primary"></i> Tìm kiếm
                                         </span>
                                     <span class="mr-2">
                                             <i class="fas fa-circle text-success"></i> Thương mại điện tử
-                                        </span>
-                                    <span class="mr-2">
-                                            <i class="fas fa-circle text-info"></i> Tìm kiếm
                                         </span>
                                 </div>
                             </div>
@@ -577,13 +574,16 @@
             <div class="row ml-2 mr-2">
                 <div class="col-12 card p-0">
                     <div class="table-responsive p-0">
-                        <table class="col-12 table table-sm">
+                        <table class="col-12 table table-sm" id="dataTable">
                             <thead class="thead-light">
                             <tr>
                                 <th>#</th>
+                                <th>Hình ảnh</th>
                                 <th width="450px">Tên Sản phẩm</th>
                                 <th>Giá</th>
                                 <th>Doanh số 30 ngày qua</th>
+                                <th>Tổng doanh số</th>
+                                <th>Lượt xem</th>
                                 <th>Lượt thích</th>
                                 <th>Đánh giá</th>
                             </tr>
@@ -592,9 +592,12 @@
                             @foreach($products as $product)
                                 <tr style="color: #24292e !important; line-height: 1.4">
                                     <td>{{ $loop->index + 1  }}</td>
+                                    <td><img src="{{ asset("storage/".$product->thumbnail.".jpg") }}" style="height: 100px; width: auto" alt=""></td>
                                     <td><a href="{{ $product->slug }}">{{ $product->name }}</a></td>
-                                    <td>{{ $product->price_min/100000 }}đ - {{ $product->price_max/100000 }}đ</td>
+                                    <td>{{ number_format($product->price_min/100000) }}đ - {{ number_format($product->price_max/100000) }}đ</td>
                                     <td>{{ $product->sold }}</td>
+                                    <td>{{ $product->history_sold }}</td>
+                                    <td>{{ $product->view }}</td>
                                     <td>{{ $product->liked }}</td>
                                     <td class="rating" data-rating="{{ $product->rating }}">
                                     </td>
@@ -662,6 +665,8 @@
 <!-- Custom scripts for all pages-->
 <script src="{{ asset('js/sb-admin-2.js') }}"></script>
 
+<!-- Page level custom scripts -->
+
 <!-- Page level plugins -->
 <script src="{{ asset('vendor/chart.js/Chart.min.js') }}"></script>
 <script src="{{ asset('js/demo/chart-area-demo.js') }} "></script>
@@ -690,6 +695,7 @@
         @endif
         @endforeach
     var ctx = document.getElementById("myAreaChart");
+    console.log(chartData)
     var myLineChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -708,7 +714,23 @@
                 pointHitRadius: 10,
                 pointBorderWidth: 2,
                 data: chartData,
-            }],
+            },
+                {
+                    label: "Tỉ lệ tìm kiếm",
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(78, 115, 223, 0.05)",
+                    borderColor: "rgba(78, 115, 223, 1)",
+                    pointRadius: 3,
+                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHoverRadius: 3,
+                    pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHitRadius: 10,
+                    pointBorderWidth: 2,
+                    data: [10, 20, 30, 40, 22, 4, 17, 60],
+                }
+            ],
         },
         options: {
             maintainAspectRatio: false,

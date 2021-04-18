@@ -195,6 +195,8 @@
                             <option value="volumeAsc">Lượng tìm kiếm: Thấp đến cao</option>
                         </select>
                     </div>
+                    <input type="hidden" id="input-sorting" name="sorting">
+                    <input type="hidden" id="input-category" name="category">
                 </form>
 
                 <!-- Topbar Navbar -->
@@ -240,7 +242,7 @@
                                         <td>{{ $loop->index + 1 }}</td>
                                         <td><a href="{{ route('keyword.detail', $keyword->name) }}">{{ $keyword->name }}</a></td>
                                         <td>{{ number_format($keyword->volume) }}</td>
-                                        <td>{{ number_format($keyword->price) }}đ</td>
+                                        <td>{{ number_format($keyword->price) }}</td>
                                         <td>
                                             <a href="{{ route('category.detail', $keyword->category->id) }}">{{ $keyword->category->name }}</a>
                                         </td>
@@ -249,6 +251,7 @@
                                 </tbody>
                             </table>
                         </div>
+{{--                        {{ $keywords->links() }}--}}
                     </div>
                 </div>
 
