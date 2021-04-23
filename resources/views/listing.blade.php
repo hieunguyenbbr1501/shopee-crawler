@@ -168,7 +168,7 @@
                 <form action="{{ route('keyword.search.list') }}" id="searchForm"
                     class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 w-100 navbar-search" style="display: flex !important;">
                     <div class="input-group col-4">
-                        <input type="text" name="keyword" class="form-control bg-light border-0 small" placeholder="Search for..."
+                        <input type="text" name="keyword" class="form-control bg-light border-0 small" placeholder="Tìm kiếm..."
                                aria-label="Search" aria-describedby="basic-addon2">
                         <div class="input-group-append">
                             <button class="btn btn-primary" type="submit">

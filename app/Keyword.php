@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Keyword extends Model
 {
     //
-    protected $fillable = ['name', 'price','volume', 'category_id'];
+    protected $fillable = ['name', 'price','volume', 'category_id', 'volume_analytic'];
     protected $searchable = [
         'name'
     ];

@@ -687,6 +687,7 @@
 
     });
     chartData = [];
+    volume_analytic = "{{ $data->volume_analytic }}";
     labels = [];
         @foreach($google_analytic as $analytic)
         @if(true)
@@ -716,7 +717,7 @@
                 data: chartData,
             },
                 {
-                    label: "Tỉ lệ tìm kiếm",
+                    label: "Diễn biến trên shopee",
                     lineTension: 0.3,
                     backgroundColor: "rgba(78, 115, 223, 0.05)",
                     borderColor: "rgba(78, 115, 223, 1)",
@@ -728,7 +729,7 @@
                     pointHoverBorderColor: "rgba(78, 115, 223, 1)",
                     pointHitRadius: 10,
                     pointBorderWidth: 2,
-                    data: [10, 20, 30, 40, 22, 4, 17, 60],
+                    data: volume_analytic,
                 }
             ],
         },
