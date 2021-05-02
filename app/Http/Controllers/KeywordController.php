@@ -102,9 +102,19 @@ class KeywordController extends Controller
         //dd($gt->getRealTimeSearchTrends());
         $categories = Category::all();
         $google_analytic = $gt->interestOverTime($keyword, 0, 'today 1-m');
+        $shopee_volume = (unserialize($data->volume_analytic));
+        $max = max($shopee_volume);
+        foreach($shopee_volume as &$value) {
+            try {
+                $value = $value/$max*100;
+            } catch (\Exception $exception) {
+                $value = 0;
+            }
+        }
+
         if ($data) {
             $products = $data->products()->get();
-            return view('detail')->with(compact('data', 'products', 'google_analytic', 'categories', 'google_volume'));
+            return view('detail')->with(compact('data', 'products', 'google_analytic', 'categories', 'google_volume','shopee_volume'));
         } else {
             $response = $this->LoginShopee('hieu15011', 'Thangnao?123', $keyword);
             dd(($response["data"]));

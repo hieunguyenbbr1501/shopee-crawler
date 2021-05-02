@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Category;
+use App\CategoryAnalytic;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class CategoryAnalyticController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -41,10 +41,10 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Category  $category
+     * @param  \App\CategoryAnalytic  $categoryAnalytic
      * @return \Illuminate\Http\Response
      */
-    public function show(Category $category)
+    public function show(CategoryAnalytic $categoryAnalytic)
     {
         //
     }
@@ -52,10 +52,10 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Category  $category
+     * @param  \App\CategoryAnalytic  $categoryAnalytic
      * @return \Illuminate\Http\Response
      */
-    public function edit(Category $category)
+    public function edit(CategoryAnalytic $categoryAnalytic)
     {
         //
     }
@@ -64,10 +64,10 @@ class CategoryController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Category  $category
+     * @param  \App\CategoryAnalytic  $categoryAnalytic
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, CategoryAnalytic $categoryAnalytic)
     {
         //
     }
@@ -75,18 +75,11 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Category  $category
+     * @param  \App\CategoryAnalytic  $categoryAnalytic
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Category $category)
+    public function destroy(CategoryAnalytic $categoryAnalytic)
     {
         //
-    }
-
-    public function detail($id) {
-        $category = Category::where(['id' => $id])->firstOrFail();
-        $categories = Category::all();
-        $keywords = $category->keywords;
-        return view('category')->with(compact('category', 'keywords', 'categories'));
     }
 }

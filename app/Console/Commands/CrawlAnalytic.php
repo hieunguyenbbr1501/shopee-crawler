@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Category;
+use App\CategoryAnalytic;
 use App\Keyword;
 use Illuminate\Console\Command;
 
@@ -12,7 +14,7 @@ class CrawlAnalytic extends Command
      *
      * @var string
      */
-    protected $signature = 'crawl:analytic';
+    protected $signature = 'crawl:analytic {--type=}';
 
     /**
      * The console command description.
@@ -38,32 +40,56 @@ class CrawlAnalytic extends Command
      */
     public function handle()
     {
-        $keywords = Keyword::all();
-        foreach ($keywords as $keyword) {
-            if ($keyword->volume_analytic != null) {
-                $crawl_analytic = unserialize($keyword->volume_analytic);
+        if ($this->option('type') == 'keyword') {
+            $keywords = Keyword::all();
+            foreach ($keywords as $keyword) {
+                if ($keyword->volume_analytic != null) {
+                    $crawl_analytic = unserialize($keyword->volume_analytic);
 
-            } else {
-                $crawl_analytic = [];
-            }
-            var_dump($crawl_analytic);
-
-            $analytic_data = $this->LoginShopee($keyword->name);
-//            dd($analytic_data["data"][0]["search_volume"]);
-            try {
-                if (sizeof($crawl_analytic) == 30) {
-                    array_pop($crawl_analytic);
-                    array_push($crawl_analytic, $analytic_data["data"][0]["search_volume"]);
                 } else {
-                    array_push($crawl_analytic, $analytic_data["data"][0]["search_volume"]);
+                    $crawl_analytic = [];
                 }
-            } catch (\Exception $exception) {
-                echo $exception->getMessage();
-            }
+                var_dump($crawl_analytic);
 
-            $keyword->volume_analytic = serialize($crawl_analytic);
-            $keyword->save();
+                $analytic_data = $this->LoginShopee($keyword->name);
+//            dd($analytic_data["data"][0]["search_volume"]);
+                try {
+                    if (sizeof($crawl_analytic) == 30) {
+                        array_pop($crawl_analytic);
+                        array_push($crawl_analytic, $analytic_data["data"][0]["search_volume"]);
+                    } else {
+                        array_push($crawl_analytic, $analytic_data["data"][0]["search_volume"]);
+                    }
+                } catch (\Exception $exception) {
+                    echo $exception->getMessage();
+                }
+
+                $keyword->volume_analytic = serialize($crawl_analytic);
+                $keyword->volume = $analytic_data["data"][0]["search_volume"];
+                $keyword->save();
+            }
         }
+        if ($this->option('type') == 'category') {
+            $categories = Category::all();
+            foreach ($categories as $category) {
+                $category_analytic = CategoryAnalytic::firstOrCreate([
+                    'name' => $category->name
+                ]);
+                $total_volume = 0;
+                $total_price = 0;
+                $total_keywords = 0;
+                foreach ($category->keywords as $keyword) {
+                    $total_volume += $keyword->volume;
+                    $total_price += $keyword->price;
+                    $total_keywords += 1;
+                }
+                $category_analytic->total_volume = $total_volume;
+                $category_analytic->total_price = $total_price;
+                $category_analytic->total_keywords = $total_keywords;
+                $category_analytic->save();
+            }
+        }
+
     }
 
     function LoginShopee($keyword)
