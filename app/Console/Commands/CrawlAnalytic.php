@@ -60,13 +60,12 @@ class CrawlAnalytic extends Command
                     } else {
                         array_push($crawl_analytic, $analytic_data["data"][0]["search_volume"]);
                     }
+                    $keyword->volume_analytic = serialize($crawl_analytic);
+                    $keyword->volume = $analytic_data["data"][0]["search_volume"];
+                    $keyword->save();
                 } catch (\Exception $exception) {
                     echo $exception->getMessage();
                 }
-
-                $keyword->volume_analytic = serialize($crawl_analytic);
-                $keyword->volume = $analytic_data["data"][0]["search_volume"];
-                $keyword->save();
             }
         }
         if ($this->option('type') == 'category') {
