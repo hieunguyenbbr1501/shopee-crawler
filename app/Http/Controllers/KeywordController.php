@@ -102,8 +102,14 @@ class KeywordController extends Controller
         //dd($gt->getRealTimeSearchTrends());
         $categories = Category::all();
         $google_analytic = $gt->interestOverTime($keyword, 0, 'today 1-m');
+	//dd($google_analytic);
         $shopee_volume = (unserialize($data->volume_analytic));
-        $max = max($shopee_volume);
+	//dd($shopee_volume);
+	$max = 0;
+	if(is_array($shopee_volume)){
+	$max = max($shopee_volume);
+	}
+	if(is_array($shopee_volume)){
         foreach($shopee_volume as &$value) {
             try {
                 $value = $value/$max*100;
@@ -111,7 +117,7 @@ class KeywordController extends Controller
                 $value = 0;
             }
         }
-
+}
         if ($data) {
             $products = $data->products()->get();
             return view('detail')->with(compact('data', 'products', 'google_analytic', 'categories', 'google_volume','shopee_volume'));
@@ -133,7 +139,7 @@ class KeywordController extends Controller
         //
         $matches = array();
         preg_match("/\d+.\d+.\d+/", $result, $matches);
-         return str_replace('.','',$matches[0]);
+         return str_replace(',','',$matches[0]);
     }
 
     function LoginShopee($SP_Username, $SP_Pass, $keyword)

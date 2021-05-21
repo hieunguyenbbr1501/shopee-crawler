@@ -674,17 +674,20 @@
     });
     chartData = [];
     volume_analytic = [];
+    @if(is_array($shopee_volume))
     @foreach($shopee_volume as $volume)
         volume_analytic.push({{ $volume }})
         @endforeach
-
+    @endif
     labels = [];
+	@if(is_array($google_analytic))
         @foreach($google_analytic as $analytic)
         @if(true)
             chartData.push({{$analytic["value"][0]}});
             labels.push("{{$analytic["formattedTime"]}}")
         @endif
         @endforeach
+	@endif
     var ctx = document.getElementById("myAreaChart");
     console.log(chartData)
     var myLineChart = new Chart(ctx, {
