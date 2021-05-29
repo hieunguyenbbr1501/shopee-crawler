@@ -101,50 +101,55 @@ class CrawlProduct extends Command
             $data = $response["items"];
             if ($data != null) {
                 foreach ($data as $item) {
-                    $item = $this->detail($item["itemid"], $item["shopid"], "https://shopee.vn/.-i." . $item["shopid"] . "." . $item["itemid"]);
-                    $item = $item["item"];
-                    $product = Product::firstOrCreate([
-                        'code' => $item["itemid"]
-                    ]);
-                    if (isset($item["image"]) && $product->thumbnail == null) {
-                        try {
-                            $url = "https://cf.shopee.vn/file/" . $item["image"];
-                            $temp_img = file_get_contents($url);
-                            $name = $item["image"] . ".jpg";
-                            Storage::put("public/" . $name, $temp_img);
-                            $product->thumbnail = $item["image"];
-                        } catch (\Exception $e) {
-                            echo $e->getMessage();
+                    try {
+                        $item = $this->detail($item["itemid"], $item["shopid"], "https://shopee.vn/.-i." . $item["shopid"] . "." . $item["itemid"]);
+                        $item = $item["item"];
+                        $product = Product::firstOrCreate([
+                            'code' => $item["itemid"]
+                        ]);
+                        if (isset($item["image"]) && $product->thumbnail == null) {
+                            try {
+                                $url = "https://cf.shopee.vn/file/" . $item["image"];
+                                $temp_img = file_get_contents($url);
+                                $name = $item["image"] . ".jpg";
+                                Storage::put("public/" . $name, $temp_img);
+                                $product->thumbnail = $item["image"];
+                            } catch (\Exception $e) {
+                                echo $e->getMessage();
+                            }
                         }
-                    }
-                    $product->code = $item["itemid"];
-                    $product->name = $item["name"];
-                    $product->sold = $item["sold"];
-                    $product->history_sold = $item["historical_sold"];
-                    $product->price_min = $item["price_min"];
-                    $product->price_max = $item["price_max"];
+                        $product->code = $item["itemid"];
+                        $product->name = $item["name"];
+                        $product->sold = $item["sold"];
+                        $product->history_sold = $item["historical_sold"];
+                        $product->price_min = $item["price_min"];
+                        $product->price_max = $item["price_max"];
 //                $product->rating  =$item["item_rating"]["rating_star"];
-                    if ($item["item_rating"]["rating_count"][0] == 0) {
-                        $product->rating = 0;
-                    } else {
-                        $product->rating = ($item["item_rating"]["rating_count"][1] + 2 * $item["item_rating"]["rating_count"][2]
-                                + 3 * $item["item_rating"]["rating_count"][3] + 4 * $item["item_rating"]["rating_count"][4]
-                                + 5 * $item["item_rating"]["rating_count"][5])
-                            / $item["item_rating"]["rating_count"][0];
+                        if ($item["item_rating"]["rating_count"][0] == 0) {
+                            $product->rating = 0;
+                        } else {
+                            $product->rating = ($item["item_rating"]["rating_count"][1] + 2 * $item["item_rating"]["rating_count"][2]
+                                    + 3 * $item["item_rating"]["rating_count"][3] + 4 * $item["item_rating"]["rating_count"][4]
+                                    + 5 * $item["item_rating"]["rating_count"][5])
+                                / $item["item_rating"]["rating_count"][0];
 
+                        }
+                        $product->liked = $item["liked_count"];
+                        $product->view = $item["view_count"];
+                        $product->slug = "https://shopee.vn/.-i." . $item["shopid"] . "." . $item["itemid"];
+                        $product->crawl_url = "https://shopee.vn/api/v2/item/get?itemid=" . $item["itemid"] . "&shopid=" . $item["shopid"];
+                        $exists = DB::table('keyword_product')
+                                ->whereKeywordId($keyword->id)
+                                ->whereProductId($item["itemid"])
+                                ->count() > 0;
+                        if ($exists == false) {
+                            $product->keywords()->attach([$keyword->id]);
+                        }
+                        $product->save();
+                    } catch (\Exception $exception) {
+
+                        continue;
                     }
-                    $product->liked = $item["liked_count"];
-                    $product->view = $item["view_count"];
-                    $product->slug = "https://shopee.vn/.-i." . $item["shopid"] . "." . $item["itemid"];
-                    $product->crawl_url = "https://shopee.vn/api/v2/item/get?itemid=" . $item["itemid"] . "&shopid=" . $item["shopid"];
-                    $exists = DB::table('keyword_product')
-                            ->whereKeywordId($keyword->id)
-                            ->whereProductId($item["itemid"])
-                            ->count() > 0;
-                    if ($exists == false) {
-                        $product->keywords()->attach([$keyword->id]);
-                    }
-                    $product->save();
 
                 }
 
