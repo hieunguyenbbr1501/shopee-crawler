@@ -96,8 +96,9 @@ class ReCrawlProduct extends Command
 
         $keywords = Keyword::all();
         foreach ($keywords as $keyword) {
+            echo $keyword->name."\n";
             if (count($keyword->products()->get()) == 0) {
-                echo $keyword->name."\n";
+                echo $keyword->name." - recrawl\n";
                 $response = $this->LoginShopee($keyword["name"], $quantity, $ch);
                 $data = $response["items"];
                 if ($data != null) {
