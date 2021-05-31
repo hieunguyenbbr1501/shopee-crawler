@@ -96,9 +96,6 @@ class CrawlProduct extends Command
 
         $keywords = Keyword::all();
         foreach ($keywords as $keyword) {
-            dd(count($keyword->products()->get()));
-        }
-        foreach ($keywords as $keyword) {
             echo $keyword->name."\n";
             $response = $this->LoginShopee($keyword["name"], $quantity, $ch);
             $data = $response["items"];
