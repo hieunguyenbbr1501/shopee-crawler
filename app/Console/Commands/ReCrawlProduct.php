@@ -8,21 +8,21 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
-class CrawlProduct extends Command
+class ReCrawlProduct extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'crawl:product';
+    protected $signature = 'recrawl:product';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Crawl Product data';
+    protected $description = 'Recrawl Product data';
 
     /**
      * Create a new command instance.
@@ -96,66 +96,65 @@ class CrawlProduct extends Command
 
         $keywords = Keyword::all();
         foreach ($keywords as $keyword) {
-            dd(count($keyword->products()->get()));
-        }
-        foreach ($keywords as $keyword) {
-            echo $keyword->name."\n";
-            $response = $this->LoginShopee($keyword["name"], $quantity, $ch);
-            $data = $response["items"];
-            if ($data != null) {
-                foreach ($data as $item) {
-                    try {
-                        $item = $this->detail($item["itemid"], $item["shopid"], "https://shopee.vn/.-i." . $item["shopid"] . "." . $item["itemid"]);
-                        $item = $item["item"];
-                        $product = Product::firstOrCreate([
-                            'code' => $item["itemid"]
-                        ]);
-                        if (isset($item["image"]) && $product->thumbnail == null) {
-                            try {
-                                $url = "https://cf.shopee.vn/file/" . $item["image"];
-                                $temp_img = file_get_contents($url);
-                                $name = $item["image"] . ".jpg";
-                                Storage::put("public/" . $name, $temp_img);
-                                $product->thumbnail = $item["image"];
-                            } catch (\Exception $e) {
-                                echo $e->getMessage();
+            if (count($keyword->products()->get()) == 0) {
+                echo $keyword->name."\n";
+                $response = $this->LoginShopee($keyword["name"], $quantity, $ch);
+                $data = $response["items"];
+                if ($data != null) {
+                    foreach ($data as $item) {
+                        try {
+                            $item = $this->detail($item["itemid"], $item["shopid"], "https://shopee.vn/.-i." . $item["shopid"] . "." . $item["itemid"]);
+                            $item = $item["item"];
+                            $product = Product::firstOrCreate([
+                                'code' => $item["itemid"]
+                            ]);
+                            if (isset($item["image"]) && $product->thumbnail == null) {
+                                try {
+                                    $url = "https://cf.shopee.vn/file/" . $item["image"];
+                                    $temp_img = file_get_contents($url);
+                                    $name = $item["image"] . ".jpg";
+                                    Storage::put("public/" . $name, $temp_img);
+                                    $product->thumbnail = $item["image"];
+                                } catch (\Exception $e) {
+                                    echo $e->getMessage();
+                                }
                             }
-                        }
-                        $product->code = $item["itemid"];
-                        $product->name = $item["name"];
-                        $product->sold = $item["sold"];
-                        $product->history_sold = $item["historical_sold"];
-                        $product->price_min = $item["price_min"];
-                        $product->price_max = $item["price_max"];
+                            $product->code = $item["itemid"];
+                            $product->name = $item["name"];
+                            $product->sold = $item["sold"];
+                            $product->history_sold = $item["historical_sold"];
+                            $product->price_min = $item["price_min"];
+                            $product->price_max = $item["price_max"];
 //                $product->rating  =$item["item_rating"]["rating_star"];
-                        if ($item["item_rating"]["rating_count"][0] == 0) {
-                            $product->rating = 0;
-                        } else {
-                            $product->rating = ($item["item_rating"]["rating_count"][1] + 2 * $item["item_rating"]["rating_count"][2]
-                                    + 3 * $item["item_rating"]["rating_count"][3] + 4 * $item["item_rating"]["rating_count"][4]
-                                    + 5 * $item["item_rating"]["rating_count"][5])
-                                / $item["item_rating"]["rating_count"][0];
+                            if ($item["item_rating"]["rating_count"][0] == 0) {
+                                $product->rating = 0;
+                            } else {
+                                $product->rating = ($item["item_rating"]["rating_count"][1] + 2 * $item["item_rating"]["rating_count"][2]
+                                        + 3 * $item["item_rating"]["rating_count"][3] + 4 * $item["item_rating"]["rating_count"][4]
+                                        + 5 * $item["item_rating"]["rating_count"][5])
+                                    / $item["item_rating"]["rating_count"][0];
 
-                        }
-                        $product->liked = $item["liked_count"];
-                        $product->view = $item["view_count"];
-                        $product->slug = "https://shopee.vn/.-i." . $item["shopid"] . "." . $item["itemid"];
-                        $product->crawl_url = "https://shopee.vn/api/v2/item/get?itemid=" . $item["itemid"] . "&shopid=" . $item["shopid"];
-                        $exists = DB::table('keyword_product')
-                                ->whereKeywordId($keyword->id)
-                                ->whereProductId($item["itemid"])
-                                ->count() > 0;
-                        if ($exists == false) {
-                            $product->keywords()->attach([$keyword->id]);
-                        }
-                        $product->save();
-                    } catch (\Exception $exception) {
+                            }
+                            $product->liked = $item["liked_count"];
+                            $product->view = $item["view_count"];
+                            $product->slug = "https://shopee.vn/.-i." . $item["shopid"] . "." . $item["itemid"];
+                            $product->crawl_url = "https://shopee.vn/api/v2/item/get?itemid=" . $item["itemid"] . "&shopid=" . $item["shopid"];
+                            $exists = DB::table('keyword_product')
+                                    ->whereKeywordId($keyword->id)
+                                    ->whereProductId($item["itemid"])
+                                    ->count() > 0;
+                            if ($exists == false) {
+                                $product->keywords()->attach([$keyword->id]);
+                            }
+                            $product->save();
+                        } catch (\Exception $exception) {
 
-                        continue;
+                            continue;
+                        }
+
                     }
 
                 }
-
             }
         }
         return 0;
