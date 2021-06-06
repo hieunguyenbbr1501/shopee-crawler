@@ -23,28 +23,28 @@ class KeywordController extends Controller
         $keywords = Keyword::query();
         $keyword_prompt = Keyword::where('name', '=', $request->get('keyword'))->first();
         $res = $request->get('keyword');
-        if ($keyword_prompt == null) {
-            $data = $this->LoginShopee('hieu15011', 'Thangnao?123', $request->get('keyword'));
-            $category_data = $this->crawlProduct($request->get('keyword'), 1)["items"][0];
-            $item = $this->detail($category_data["itemid"], $category_data["shopid"], "https://shopee.vn/.-i." . $category_data["shopid"] . "." . $category_data["itemid"]);
-            $category = Category::firstOrCreate([
-                'name' => $item["item"]["categories"][0]["display_name"]
-            ]);
-            foreach ($data["data"] as $word) {
-
-                $keyword = Keyword::where('name', '=', $word["keyword"])->first();
-                if ($keyword == null) {
-                    $keyword = Keyword::firstOrCreate([
-                        'name' => $word["keyword"],
-                        'category_id' => $category->id
-                    ]);
-                }
-                $keyword->price = $word["recommend_price"];
-                $keyword->volume = $word["search_volume"];
-                $keyword->save();
-                $res = $keyword->keyword;
-            }
-        }
+//        if ($keyword_prompt == null) {
+//            $data = $this->LoginShopee('hieu15011', 'Thangnao?123', $request->get('keyword'));
+//            $category_data = $this->crawlProduct($request->get('keyword'), 1)["items"][0];
+//            $item = $this->detail($category_data["itemid"], $category_data["shopid"], "https://shopee.vn/.-i." . $category_data["shopid"] . "." . $category_data["itemid"]);
+//            $category = Category::firstOrCreate([
+//                'name' => $item["item"]["categories"][0]["display_name"]
+//            ]);
+//            foreach ($data["data"] as $word) {
+//
+//                $keyword = Keyword::where('name', '=', $word["keyword"])->first();
+//                if ($keyword == null) {
+//                    $keyword = Keyword::firstOrCreate([
+//                        'name' => $word["keyword"],
+//                        'category_id' => $category->id
+//                    ]);
+//                }
+//                $keyword->price = $word["recommend_price"];
+//                $keyword->volume = $word["search_volume"];
+//                $keyword->save();
+//                $res = $keyword->keyword;
+//            }
+//        }
         $keywords = $keywords->search($request->request->get("keyword"));
         if ($request->has('category') && $request->get('category') != null) {
             $keywords->category($request->get('category'));
