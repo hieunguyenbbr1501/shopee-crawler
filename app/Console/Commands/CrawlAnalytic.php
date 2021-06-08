@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Category;
 use App\CategoryAnalytic;
 use App\Keyword;
+use App\KeywordAnalytic;
 use Illuminate\Console\Command;
 
 class CrawlAnalytic extends Command
@@ -86,6 +87,16 @@ class CrawlAnalytic extends Command
                 $category_analytic->total_price = $total_price;
                 $category_analytic->total_keywords = $total_keywords;
                 $category_analytic->save();
+            }
+
+            KeywordAnalytic::truncate();
+            $top_keywords = Keyword::orderBy('volume', 'desc')->limit(10)->get();
+            foreach ($top_keywords as $top_keyword) {
+                $keyword_analytic = new KeywordAnalytic;
+                $keyword_analytic->name = $top_keyword->name;
+                $keyword_analytic->price = $top_keyword->price;
+                $keyword_analytic->volume = $top_keyword->volume;
+                $keyword_analytic->save();
             }
         }
 
