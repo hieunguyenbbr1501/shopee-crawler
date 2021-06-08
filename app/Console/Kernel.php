@@ -25,6 +25,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+        $schedule->command('crawl:analytic --type=category')->cron('0 0 * * *')->runInBackground();
+        $schedule->command('crawl:analytic --type=keyword')->cron('0 1 * * *')->runInBackground();
     }
 
     /**

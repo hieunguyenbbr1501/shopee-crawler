@@ -45,7 +45,7 @@ class KeywordController extends Controller
 //                $res = $keyword->keyword;
 //            }
 //        }
-        $keywords = $keywords->search($request->request->get("keyword"));
+        $keywords = $keywords->search($request->request->get("keyword"))->select('name', 'price', 'volume', 'category_id')->with('category');
         if ($request->has('category') && $request->get('category') != null) {
             $keywords->category($request->get('category'));
         }
