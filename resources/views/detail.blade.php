@@ -173,9 +173,9 @@
                       class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 w-100 navbar-search" style="display: flex !important;">
                     <div class="input-group col-4">
                         <input type="text" name="keyword" class="form-control bg-light border-0 small" placeholder="Search for..."
-                               aria-label="Search" aria-describedby="basic-addon2">
+                               aria-label="Search" aria-describedby="basic-addon2" onchange="onSearchChange()">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="submit">
+                            <button class="btn btn-primary" type="submit" id="searchBtn" disabled>
                                 <i class="fas fa-search fa-sm"></i>
                             </button>
                         </div>
@@ -205,47 +205,47 @@
                 <ul class="navbar-nav ml-auto">
 
                     <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                    <li class="nav-item dropdown no-arrow d-sm-none">
-                        <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-search fa-fw"></i>
-                        </a>
-                        <!-- Dropdown - Messages -->
-                        <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
-                             aria-labelledby="searchDropdown">
-                            <form action="{{ route('keyword.search.list') }}" id="searchForm"
-                                  class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 w-100 navbar-search" style="display: flex !important;">
-                                <div class="input-group col-4">
-                                    <input type="text" name="keyword" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                           aria-label="Search" aria-describedby="basic-addon2">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary" type="submit">
-                                            <i class="fas fa-search fa-sm"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="input-group col-2">
-                                    <select class="form-select form-control" id="category" onchange="onCategoryChange()"
-                                            aria-label="Ngành hàng">
-                                        <option selected>Ngành hàng</option>
-                                        @foreach($categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-2 input-group">
-                                    <select class="form-select form-control" id="sorting" onchange="onSortingChange()"
-                                            aria-label="Sắp xếp">
-                                        <option selected>Sắp xếp</option>
-                                        <option value="priceDesc">Giá: Cao đến thấp</option>
-                                        <option value="priceAsc">Giá: Thấp đến cao</option>
-                                        <option value="volumeDesc">Lượng tìm kiếm: Cao đến thấp</option>
-                                        <option value="volumeAsc">Lượng tìm kiếm: Thấp đến cao</option>
-                                    </select>
-                                </div>
-                            </form>
-                        </div>
-                    </li>
+{{--                    <li class="nav-item dropdown no-arrow d-sm-none">--}}
+{{--                        <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"--}}
+{{--                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">--}}
+{{--                            <i class="fas fa-search fa-fw"></i>--}}
+{{--                        </a>--}}
+{{--                        <!-- Dropdown - Messages -->--}}
+{{--                        <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"--}}
+{{--                             aria-labelledby="searchDropdown">--}}
+{{--                            <form action="{{ route('keyword.search.list') }}" id="searchForm"--}}
+{{--                                  class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 w-100 navbar-search" style="display: flex !important;">--}}
+{{--                                <div class="input-group col-4">--}}
+{{--                                    <input type="text" name="keyword" class="form-control bg-light border-0 small" placeholder="Search for..."--}}
+{{--                                           aria-label="Search" aria-describedby="basic-addon2">--}}
+{{--                                    <div class="input-group-append">--}}
+{{--                                        <button class="btn btn-primary" type="submit">--}}
+{{--                                            <i class="fas fa-search fa-sm"></i>--}}
+{{--                                        </button>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="input-group col-2">--}}
+{{--                                    <select class="form-select form-control" id="category" onchange="onCategoryChange()"--}}
+{{--                                            aria-label="Ngành hàng">--}}
+{{--                                        <option selected>Ngành hàng</option>--}}
+{{--                                        @foreach($categories as $category)--}}
+{{--                                            <option value="{{ $category->id }}">{{ $category->name }}</option>--}}
+{{--                                        @endforeach--}}
+{{--                                    </select>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-2 input-group">--}}
+{{--                                    <select class="form-select form-control" id="sorting" onchange="onSortingChange()"--}}
+{{--                                            aria-label="Sắp xếp">--}}
+{{--                                        <option selected>Sắp xếp</option>--}}
+{{--                                        <option value="priceDesc">Giá: Cao đến thấp</option>--}}
+{{--                                        <option value="priceAsc">Giá: Thấp đến cao</option>--}}
+{{--                                        <option value="volumeDesc">Lượng tìm kiếm: Cao đến thấp</option>--}}
+{{--                                        <option value="volumeAsc">Lượng tìm kiếm: Thấp đến cao</option>--}}
+{{--                                    </select>--}}
+{{--                                </div>--}}
+{{--                            </form>--}}
+{{--                        </div>--}}
+{{--                    </li>--}}
 
                     <!-- Nav Item - Alerts -->
                     <!--                    <li class="nav-item dropdown no-arrow mx-1">-->
@@ -828,6 +828,7 @@
         },
     });
 </script>
+<script src="{{ asset('js/listing.js') }}"></script>
 
 </body>
 

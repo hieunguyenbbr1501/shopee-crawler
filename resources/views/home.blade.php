@@ -49,9 +49,9 @@
                       class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 w-100 navbar-search" style="display: flex !important;">
                     <div class="input-group col-lg-4 col-md-12">
                         <input type="text" name="keyword" class="form-control bg-light border-0 small" placeholder="Search for..."
-                               aria-label="Search" aria-describedby="basic-addon2">
+                               aria-label="Search" aria-describedby="basic-addon2" onchange="onSearchChange()">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="submit">
+                            <button class="btn btn-primary" id="searchBtn" type="submit" disabled>
                                 <i class="fas fa-search fa-sm"></i>
                             </button>
                         </div>
@@ -75,6 +75,8 @@
                             <option value="volumeAsc">Lượng tìm kiếm: Thấp đến cao</option>
                         </select>
                     </div>
+                    <input type="hidden" id="input-sorting" name="sorting">
+                    <input type="hidden" id="input-category" name="category">
                 </form>
 
                 <!-- Topbar Navbar -->
@@ -363,7 +365,18 @@
         },
 
     });
+
+    function onCategoryChange() {
+        let category = $('#category').val()
+        $('#input-category').val(category);
+    }
+    function onSortingChange() {
+        let sorting = $('#sorting').val()
+        $('#input-sorting').val(sorting);
+    }
+
 </script>
+<script src="{{ asset('js/listing.js') }}"></script>
 
 </body>
 

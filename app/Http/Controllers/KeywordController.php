@@ -23,6 +23,7 @@ class KeywordController extends Controller
         $keywords = Keyword::query();
         $keyword_prompt = Keyword::where('name', '=', $request->get('keyword'))->first();
         $res = $request->get('keyword');
+
 //        if ($keyword_prompt == null) {
 //            $data = $this->LoginShopee('hieu15011', 'Thangnao?123', $request->get('keyword'));
 //            $category_data = $this->crawlProduct($request->get('keyword'), 1)["items"][0];
@@ -45,9 +46,11 @@ class KeywordController extends Controller
 //                $res = $keyword->keyword;
 //            }
 //        }
-        $keywords = $keywords->search($request->request->get("keyword"))->select('name', 'price', 'volume', 'category_id')->with('category');
+        if ($res != null) {
+            $keywords = $keywords->search($request->request->get("keyword"))->select('name', 'price', 'volume', 'category_id')->with('category');
+        }
         if ($request->has('category') && $request->get('category') != null) {
-            $keywords->category($request->get('category'));
+            $keywords->category($request->get('category'))->with('category');
         }
         if ($request->has('sorting')) {
             switch ($request->get('sorting')) {
@@ -65,7 +68,11 @@ class KeywordController extends Controller
                 }
             }
         }
+
         $keywords = $keywords->get();
+
+
+
         return view('listing')->with(compact('keywords', 'categories','res'));
     }
 

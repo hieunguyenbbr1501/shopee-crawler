@@ -169,9 +169,9 @@
                       class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 w-100 navbar-search" style="display: flex !important;">
                     <div class="input-group col-4">
                         <input type="text" name="keyword" class="form-control bg-light border-0 small" placeholder="Tìm kiếm..."
-                               aria-label="Search" aria-describedby="basic-addon2">
+                               aria-label="Search" aria-describedby="basic-addon2" onchange="onSearchChange()">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="submit">
+                            <button class="btn btn-primary" type="submit" id="searchBtn" disabled>
                                 <i class="fas fa-search fa-sm"></i>
                             </button>
                         </div>
